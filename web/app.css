@@ -1,0 +1,105 @@
+/* 灵途自生 · 共享界面样式（纸墨风格）
+   三页（入世 / 写作台 / 观察台）共用。本文件在页面自带 <style> 之后加载，
+   因此是「组件层」的权威：统一配色、页头、导航、按钮与表单控件，
+   但不动各页自己的版式类（.metrics/.ledger/.paper 等）。
+
+   ⚠ 改界面时请勿删除页面里的文字标记，测试与自检依赖它们：
+      "成为世界中的一个人"（入世页）、"小说写作工作台"（写作台）、"世界观察台"（观察台）。 */
+
+:root{
+  --paper:#eee9df; --surface:#f7f4ed; --white:#fffdf9;
+  --ink:#282923; --muted:#77766c; --line:#d3cec2; --shade:#e2ddd2;
+  --accent:#a4382b; --accent-deep:#7f291f; --moss:#4d5f47; --moss-deep:#38492f; --amber:#9b712b;
+  --ok:#3f6b4a; --warn:#9b712b; --bad:#a4382b;
+  --serif:"Source Han Serif SC","Noto Serif CJK SC","Songti SC",serif;
+  --sans:"Source Han Sans SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;
+  --mono:"Cascadia Code","Microsoft YaHei UI",monospace;
+  --r:3px; --r-lg:6px;
+  --shadow:0 1px 0 rgba(40,41,35,.04),0 10px 30px -18px rgba(40,41,35,.35);
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+
+*{box-sizing:border-box}
+html{background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100vh;background:var(--paper);color:var(--ink);
+  font:14px/1.7 var(--sans);text-rendering:optimizeLegibility}
+::selection{background:var(--accent);color:#fff6ee}
+
+a{color:inherit;text-decoration:none}
+a:hover{text-decoration:underline}
+
+.eyebrow{font:11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.quiet,.muted,.help{color:var(--muted)}
+.quiet,.help{font-size:12px;line-height:1.65}
+.mono{font-family:var(--mono)}
+.hidden{display:none !important}
+
+/* —— 页头 / 导航（.mast 与旧版 .top 同款）—— */
+.mast,.top{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
+  min-height:62px;padding:12px clamp(18px,4vw,64px);
+  border-bottom:1px solid var(--line);background:rgba(247,244,237,.72);
+  position:sticky;top:0;z-index:30;backdrop-filter:saturate(1.1) blur(6px)}
+.brand{display:flex;align-items:baseline;gap:14px;min-width:0}
+.brand strong,.brand h1{margin:0;font:600 20px var(--serif);letter-spacing:.02em}
+.brand small,.brand span{font:12px var(--mono);color:var(--muted)}
+.mark{display:inline-flex;align-items:center;gap:8px}
+
+.nav,.mastnav{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:13px}
+.nav a,.mastnav a{padding:6px 12px;border:1px solid transparent;border-radius:var(--r);
+  color:var(--muted);transition:background .16s var(--ease),color .16s var(--ease),border-color .16s var(--ease)}
+.nav a:hover,.mastnav a:hover{background:var(--shade);color:var(--ink);text-decoration:none}
+.nav a.active,.mastnav a.active{border-color:var(--line);background:var(--white);color:var(--ink);font-weight:600}
+.nav a.active::before,.mastnav a.active::before{content:"";width:6px;height:6px;border-radius:50%;
+  background:var(--accent);margin-right:8px;display:inline-block;vertical-align:middle}
+.state,.server{font:12px var(--mono);color:var(--muted);display:inline-flex;align-items:center;gap:8px}
+.lamp{width:8px;height:8px;border-radius:50%;background:var(--amber);display:inline-block}
+.lamp.on{background:var(--moss)}
+
+/* —— 控件（统一三页）—— */
+button,input,select,textarea{font:inherit}
+button{min-height:40px;padding:0 16px;border:1px solid var(--ink);border-radius:var(--r);
+  background:transparent;color:var(--ink);cursor:pointer;white-space:nowrap;
+  transition:background .16s var(--ease),color .16s var(--ease),border-color .16s var(--ease),transform .16s var(--ease)}
+button:hover:not(:disabled){background:var(--ink);color:var(--surface);transform:translateY(-1px)}
+button:active:not(:disabled){transform:translateY(0)}
+button:disabled{opacity:.45;cursor:not-allowed;transform:none}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff9ef}
+button.primary:hover:not(:disabled){background:var(--accent-deep);border-color:var(--accent-deep);color:#fff9ef}
+button.quiet{border-color:var(--line);color:var(--muted)}
+button.quiet:hover:not(:disabled){background:var(--shade);color:var(--ink)}
+button.ghost{border-color:transparent;color:var(--muted)}
+button.ghost:hover:not(:disabled){background:var(--shade);color:var(--ink)}
+button.sm{min-height:30px;padding:2px 10px;font-size:12px}
+
+input,select,textarea{width:100%;min-height:40px;padding:8px 11px;border:1px solid var(--line);
+  border-radius:var(--r);background:var(--surface);color:var(--ink)}
+input[type=file]{min-height:0;padding:7px 9px;font-size:12px}
+input[type=file]::file-selector-button{font:inherit;margin-right:10px;padding:4px 10px;border:1px solid var(--line);
+  border-radius:var(--r);background:var(--white);color:var(--ink);cursor:pointer}
+input::placeholder,textarea::placeholder{color:#9b9a90}
+textarea{resize:vertical;line-height:1.7}
+label{display:block;font-size:12px;color:var(--muted);margin:14px 0 6px}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px;border-radius:var(--r)}
+
+/* —— 小部件 —— */
+.section-title{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;row-gap:6px}
+.section-title h2{margin:0;font:600 15px var(--serif);white-space:nowrap}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:1px 8px;border:1px solid var(--line);
+  border-radius:999px;background:var(--white);font:11px var(--mono);color:var(--muted)}
+.badge.canon{border-color:var(--accent);color:var(--accent)}
+.badge.author{border-color:var(--moss);color:var(--moss)}
+.badge.inference{border-color:var(--amber);color:var(--warn)}
+.empty{padding:14px 0;color:var(--muted);font-size:13px}
+
+.event{transition:background .16s var(--ease)}
+.event:hover{background:rgba(226,221,210,.5)}
+
+.notice,.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,14px);
+  max-width:min(680px,86vw);padding:11px 18px;border:1px solid var(--ink);border-radius:var(--r);
+  background:var(--ink);color:var(--surface);font-size:13px;box-shadow:var(--shadow);
+  opacity:0;pointer-events:none;transition:opacity .2s var(--ease),transform .2s var(--ease);z-index:60}
+.notice.visible,.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition:none !important;animation:none !important}
+}

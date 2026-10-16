@@ -1,0 +1,37 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>灵途自生 · 入世</title><style>
+main{max-width:1080px;margin:auto;padding:36px clamp(16px,4vw,56px) 90px}
+.hero{padding:10px 0 26px;border-bottom:1px solid var(--line);margin-bottom:30px}
+.hero h1{margin:10px 0;font:500 clamp(30px,4.6vw,48px)/1.15 var(--serif)}
+.lead{color:var(--muted);max-width:54ch;margin:0}
+.intro{max-width:680px}
+section{padding-top:0;margin-top:0}
+section+section{border-top:1px solid var(--line);padding-top:22px;margin-top:30px}
+#setup section{border-top:0}
+section h2{margin:0 0 16px;font:600 19px var(--serif)}
+.foot{color:var(--muted);font-size:12px;margin:14px 0 0}
+.form{max-width:620px}
+.pair{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+.form button[type=submit]{margin-top:22px;min-height:46px;padding:0 26px}
+.layout{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(280px,.78fr);gap:40px;align-items:start}
+.meta{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.identity{font:500 26px var(--serif);margin:2px 0 4px}
+.goal{font:16px/1.8 var(--serif);padding:14px 18px;margin-top:12px;border-left:3px solid var(--accent);background:var(--surface)}
+.actions{display:grid;gap:14px}
+.actions form{padding:16px 18px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg)}
+.actions form button[type=submit]{margin-top:14px}
+.people{display:grid;gap:10px}
+.person{padding:11px 14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.person small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.event{padding:12px 0;border-bottom:1px solid var(--line)}
+.event time{display:block;font:11px var(--mono);color:var(--muted);margin-bottom:4px}
+.event p{margin:0}
+#message{margin:26px 0 0}
+#message:empty{display:none}
+#message:not(:empty){padding:12px 16px;border-top:1px solid var(--line);color:var(--ink);font-size:13px}
+@media(max-width:880px){.layout{grid-template-columns:1fr;gap:26px}}
+@media(max-width:560px){.pair{grid-template-columns:1fr}}
+</style><link rel="stylesheet" href="/app.css"></head><body><header class="mast"><div class="brand"><strong>灵途自生</strong><span>入世</span></div><nav class="nav" aria-label="主导航"><a href="/" class="active">入世</a><a href="/write">小说写作台</a><a href="/simulation">世界观察台</a></nav></header><main><div class="hero"><span class="eyebrow">YOU ARE INSIDE THE STORY</span><h1 id="heading">成为世界中的一个人</h1><p class="lead" id="subtitle">你写下的身份和行动会留在这个世界的历史里，不能事后改写。</p></div><div id="setup" class="intro hidden"><section><h2>选择你的身份</h2><form id="create" class="form"><div class="pair"><div><label for="name">姓名</label><input id="name" maxlength="24" required placeholder="你希望被称为什么"></div><div><label for="age">年龄</label><input id="age" type="number" min="14" max="90" value="20" required></div></div><label for="occupation">在世界里的身份</label><input id="occupation" maxlength="32" required placeholder="例如：行脚郎中、返乡的旅人"><label for="goal">你此刻想做成什么</label><textarea id="goal" maxlength="120" required placeholder="这个目标会跟随你进入世界"></textarea><button type="submit">进入这个世界</button></form><p class="foot">入世身份一旦建立就不可替换；世界不会自动替你写人物的未来。</p></section></div><div id="world" class="layout hidden"><div><section><div class="meta"><div><p class="quiet">当前身份</p><p class="identity" id="identity"></p><span class="quiet" id="identity-detail"></span></div><div><p class="quiet" id="time"></p><p id="place"></p></div></div><div class="goal" id="player-goal"></div></section><section><h2>此刻可以做什么</h2><div class="actions"><form id="visit"><label for="target">拜访一位村民</label><select id="target" required></select><label for="words">你想说的话</label><textarea id="words" required maxlength="160" placeholder="对方会记住这次拜访，内容不是 AI 自动答话"></textarea><button type="submit">前去拜访</button></form><form id="talk"><label for="talk-target">与村民对话（本地模型）</label><select id="talk-target" required></select><label for="talk-words">你想说什么</label><textarea id="talk-words" required maxlength="160" placeholder="村民会依据自身档案与记忆回应"></textarea><button type="submit">开始交谈</button></form><form id="help"><button type="submit">帮助村民采薪</button><p class="quiet">村里得到 1 单位薪柴，附近林木减少；行动会留在历史中。</p></form></div></section></div><aside><section><h2>你的经历</h2><div id="experiences"></div></section><section style="margin-top:30px"><h2>村中的人</h2><div id="people" class="people"></div></section></aside></div><p id="message" class="error" role="status" aria-live="polite"></p></main><script>
+const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));let saving=false;async function api(path,options={}){const r=await fetch(path,{...options,headers:{"Content-Type":"application/json"}});const data=await r.json();if(!r.ok)throw Error(data.error||"请求失败");return data}function message(s){$("message").textContent=s}async function refresh(){const [person,status,people]=await Promise.all([api("/api/player"),api("/api/status"),api("/api/people")]);const me=person.player;$("setup").classList.toggle("hidden",!!me);$("world").classList.toggle("hidden",!me);$("heading").textContent=me?`你是${me.name}`:"成为世界中的一个人";$("subtitle").textContent=me?"在这里，你的行动是故事事实，作者可以在写作台引用这些经历。":"你写下的身份和行动会留在这个世界的历史里，不能事后改写。";if(!me)return;$("identity").textContent=me.name;$("identity-detail").textContent=`${me.age} 岁 · ${me.occupation}`;$("player-goal").textContent=`心中所愿：${(me.goal_stack||[])[0]||"—"}`;$("time").textContent=`第 ${status["第几日"]} 日`;$("place").textContent=status["聚落"];$("experiences").innerHTML=(me.experiences||[]).map(e=>`<article class="event"><time>第 ${Math.floor(e.tick/24)} 日 · 事件 #${e.id}</time><p>${esc(e.summary)}</p></article>`).join("")||'<p class="quiet">你还没有经历。</p>';const locals=people.filter(p=>p.status==="alive"&&p.id!==me.id&&p.profile?.origin!=="到访者");$("target").innerHTML=locals.map(p=>`<option value="${p.id}">${esc(p.name)} · ${esc(p.occupation)}</option>`).join("");$("talk-target").innerHTML=$("target").innerHTML;$("people").innerHTML=locals.map(p=>`<div class="person">${esc(p.name)}<small>${esc((p.goal_stack||[])[0]||"")}</small></div>`).join("")}
+async function act(path,payload,button){if(saving)return;saving=true;button.disabled=true;message("");try{const result=await api(path,{method:"POST",body:JSON.stringify(payload)});await refresh();message(result.summary||"已进入世界历史")}catch(e){message(e.message)}finally{saving=false;button.disabled=false}}
+$("create").onsubmit=e=>{e.preventDefault();act("/api/player",{name:$("name").value,age:Number($("age").value),occupation:$("occupation").value,goal:$("goal").value},e.submitter)};$("visit").onsubmit=e=>{e.preventDefault();act("/api/player/action",{action:"visit",target_id:Number($("target").value),words:$("words").value},e.submitter)};$("talk").onsubmit=e=>{e.preventDefault();act("/api/player/action",{action:"talk",target_id:Number($("talk-target").value),words:$("talk-words").value},e.submitter)};$("help").onsubmit=e=>{e.preventDefault();act("/api/player/action",{action:"help"},e.submitter)};refresh().catch(e=>message(e.message));
+</script></body></html>

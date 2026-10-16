@@ -1,0 +1,35 @@
+# —— 运行数据与私密存档：绝不入库 ——
+db/
+worlds/
+*.db
+*.sqlite
+*.sqlite3
+*.db-wal
+*.db-shm
+
+# —— 构建与分发产物 ——
+out/
+dist/
+build/
+*.spec
+
+# —— 生成的可视化报告（用 tools/build_dashboard.py / build_spec.py 重新生成）——
+lingtu-zisheng-spec.html
+lingtu-zisheng-sim.html
+lingtu-zisheng-audit.html
+
+# —— Python ——
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# —— 编辑器 / 系统 ——
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# —— 日志 ——
+*.log
